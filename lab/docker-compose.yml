@@ -1,0 +1,23 @@
+# Real FreeSWITCH lab. Host networking so the read-back MESSAGE returns to the
+# operator. One service at a time (both want 5060).
+#
+#   docker compose up                       # vulnerable 1.10.12
+#   FS_IMAGE=safarov/freeswitch:1.11.3 docker compose up   # patched (403)
+#
+services:
+  freeswitch:
+    image: "${FS_IMAGE:-safarov/freeswitch:1.10.12}"
+    container_name: sip2shell-fsw
+    network_mode: host
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        [ -f /etc/freeswitch/freeswitch.xml ] || cp -a /usr/share/freeswitch/conf/vanilla/. /etc/freeswitch/
+        sed -i 's/default_password=.*/default_password=1234"/' /etc/freeswitch/vars.xml 2>/dev/null || true
+        for p in internal external; do
+          f=/etc/freeswitch/sip_profiles/$p.xml
+          [ -f "$f" ] || continue
+          grep -q auth-messages "$f" || sed -i 's#<settings>#<settings>\n    <param name="auth-messages" value="false"/>#' "$f"
+        done
+        exec /usr/bin/freeswitch -nc -nf -nonat
