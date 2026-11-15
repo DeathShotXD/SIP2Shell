@@ -20,6 +20,11 @@ class TestPayload(unittest.TestCase):
         self.assertIn("%2B", q)
         self.assertNotIn("+", q)
 
+    def test_to_user_guards_the_sofia_buffer(self):
+        self.assertEqual(s2s._to_user("version"), "api+version")
+        with self.assertRaises(s2s.SipError):
+            s2s._to_user("system " + "a" * s2s.MAX_TO_USER)
+
     def test_sip_message_shape(self):
         msg = s2s.sip_message("MESSAGE", "1.2.3.4", 5060, "api+version",
                               "5.6.7.8", 4000, udp=True, body=b"x",

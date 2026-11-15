@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/CVSS-9.8%20critical-d41414?style=flat-square&amp;labelColor=070607" alt="CVSS 9.8 critical">
   <img src="https://img.shields.io/badge/CISA-KEV-d41414?style=flat-square&amp;labelColor=070607" alt="CISA KEV">
   <img src="https://img.shields.io/badge/python-3.8%2B-f0e2c8?style=flat-square&amp;labelColor=070607&amp;logo=python&amp;logoColor=f0e2c8" alt="Python 3.8+">
-  <img src="https://img.shields.io/badge/tests-11%20passing-35d0c0?style=flat-square&amp;labelColor=070607" alt="11 tests passing">
+  <img src="https://img.shields.io/badge/tests-12%20passing-35d0c0?style=flat-square&amp;labelColor=070607" alt="12 tests passing">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-f0e2c8?style=flat-square&amp;labelColor=070607" alt="MIT license"></a>
   <a href="https://github.com/DeathShotXD/SIP2Shell/stargazers"><img src="https://img.shields.io/github/stars/DeathShotXD/SIP2Shell?style=flat-square&amp;labelColor=070607&amp;color=f0e2c8" alt="GitHub stars"></a>
 </p>
@@ -282,7 +282,7 @@ vector), the SOCKS5 parser, folded headers, the reverse-shell presets, and the
 UDP-plus-proxy guard:
 
 ```bash
-python3 -m unittest discover -s tests   # 11 tests
+python3 -m unittest discover -s tests   # 12 tests
 ```
 
 CI runs the same suite on Python 3.9 through 3.13 (Ubuntu 24.04). The full
@@ -323,9 +323,11 @@ whether inbound `MESSAGE` is accepted at all.
 
 ## Limits
 
-- The To user is copied into a ~512-byte buffer and the first `+` is special:
-  spaces are `%20` and any command `+` is `%2B`. Keep the encoded command under
-  ~500 bytes; the tool does.
+- The To user is copied into a `char proto[512]` buffer and the first `+` is
+  special: spaces are `%20` and any command `+` is `%2B`. The tool refuses to
+  send an encoded To user over 500 bytes instead of letting FreeSWITCH cut the
+  command in half. With OOB exfil in the loop, that leaves room for roughly
+  100 characters of shell.
 - The chat layer is an async queue. A `202` proves the MESSAGE was accepted,
   not that the command ran. The output is the proof.
 - An auth-walled profile (`401` or `407`) needs valid credentials. The tool
