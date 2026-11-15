@@ -1,0 +1,27 @@
+[project]
+name = "sip2shell"
+version = "0.1.0"
+description = "Unauthenticated RCE on FreeSWITCH via a single SIP MESSAGE (CVE-2026-116779)"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "DeathShotXD" }]
+keywords = ["freeswitch", "sip", "cve-2026-116779", "rce", "security", "offsec"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Security",
+]
+
+[project.scripts]
+sip2shell = "sip2shell:main"
+
+[project.urls]
+Homepage = "https://github.com/DeathShotXD/SIP2Shell"
+
+[tool.setuptools]
+py-modules = ["sip2shell"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
