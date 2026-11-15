@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 330" width="1200" height="330" role="img" aria-labelledby="stitle sdesc">
+  <title id="stitle">FreeSWITCH API surface reachable through the api chat protocol</title>
+  <desc id="sdesc">Six tiles list the commands one injected MESSAGE can reach: system, originate, sofia status, xml_locate, module_load and lua.</desc>
+  <defs>
+    <linearGradient id="sbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070607"/>
+      <stop offset=".6" stop-color="#0a0809"/>
+      <stop offset="1" stop-color="#110607"/>
+    </linearGradient>
+    <pattern id="sgrid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M30 0 L0 0 0 30" fill="none" stroke="#d41414" stroke-opacity=".05"/>
+    </pattern>
+    <style>
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+      .kicker { font-size: 10.5px; letter-spacing: 2.2px; fill: #8a7a66; }
+      .cmd { font-size: 15px; font-weight: 800; letter-spacing: .3px; fill: #f0e2c8; }
+      .d { font-size: 11px; letter-spacing: .3px; fill: #b7a68e; }
+      .n { font-size: 9.5px; letter-spacing: 1.6px; fill: #7d7062; }
+      .foot { font-size: 10.5px; letter-spacing: 1px; fill: #7d7062; }
+      .pulse { animation: sp 3.6s ease-in-out infinite; }
+      @keyframes sp { 0%,100% { opacity:.5; } 50% { opacity:1; } }
+      @media (prefers-reduced-motion: reduce) { .pulse { animation: none; } }
+    </style>
+  </defs>
+
+  <rect width="1200" height="330" fill="url(#sbg)"/>
+  <rect width="1200" height="330" fill="url(#sgrid)"/>
+
+  <text x="40" y="36" class="mono kicker" fill="#8a7a66">WHAT ONE COMMAND BUYS YOU</text>
+  <text x="1160" y="36" text-anchor="end" class="mono kicker" fill="#8a7a66">AS THE FREESWITCH USER</text>
+
+  <!-- row 1 -->
+  <g transform="translate(40 58)">
+    <rect width="360" height="100" rx="8" fill="#0d0809" stroke="#d41414" stroke-opacity=".28"/>
+    <circle cx="20" cy="20" r="3" fill="#d41414" class="pulse"/>
+    <text x="32" y="23" class="mono n" fill="#7d7062">01 / OS</text>
+    <text x="18" y="52" class="mono cmd" fill="#ff5a5a">system &lt;cmd&gt;</text>
+    <text x="18" y="76" class="mono d" fill="#b7a68e">run a shell command as the daemon</text>
+    <text x="342" y="52" text-anchor="end" class="mono n" fill="#d41414">RCE</text>
+  </g>
+  <g transform="translate(420 58)">
+    <rect width="360" height="100" rx="8" fill="#0c0808" stroke="#d41414" stroke-opacity=".22"/>
+    <circle cx="20" cy="20" r="3" fill="#d41414" class="pulse"/>
+    <text x="32" y="23" class="mono n" fill="#7d7062">02 / CALLS</text>
+    <text x="18" y="52" class="mono cmd" fill="#f0e2c8">originate</text>
+    <text x="18" y="76" class="mono d" fill="#b7a68e">place calls through the switch</text>
+    <text x="342" y="52" text-anchor="end" class="mono n" fill="#d41414">TOLL FRAUD</text>
+  </g>
+  <g transform="translate(800 58)">
+    <rect width="360" height="100" rx="8" fill="#0c0808" stroke="#d41414" stroke-opacity=".22"/>
+    <circle cx="20" cy="20" r="3" fill="#d41414" class="pulse"/>
+    <text x="32" y="23" class="mono n" fill="#7d7062">03 / SIP</text>
+    <text x="18" y="52" class="mono cmd" fill="#f0e2c8">sofia status</text>
+    <text x="18" y="76" class="mono d" fill="#b7a68e">profiles, gateways, registrations</text>
+    <text x="342" y="52" text-anchor="end" class="mono n" fill="#d41414">RECON</text>
+  </g>
+
+  <!-- row 2 -->
+  <g transform="translate(40 174)">
+    <rect width="360" height="100" rx="8" fill="#0c0808" stroke="#d41414" stroke-opacity=".22"/>
+    <circle cx="20" cy="20" r="3" fill="#d41414" class="pulse"/>
+    <text x="32" y="23" class="mono n" fill="#7d7062">04 / CONFIG</text>
+    <text x="18" y="52" class="mono cmd" fill="#f0e2c8">xml_locate</text>
+    <text x="18" y="76" class="mono d" fill="#b7a68e">config, passwords, provider creds</text>
+    <text x="342" y="52" text-anchor="end" class="mono n" fill="#d41414">SECRETS</text>
+  </g>
+  <g transform="translate(420 174)">
+    <rect width="360" height="100" rx="8" fill="#0c0808" stroke="#d41414" stroke-opacity=".22"/>
+    <circle cx="20" cy="20" r="3" fill="#d41414" class="pulse"/>
+    <text x="32" y="23" class="mono n" fill="#7d7062">05 / CODE</text>
+    <text x="18" y="52" class="mono cmd" fill="#f0e2c8">module_load</text>
+    <text x="18" y="76" class="mono d" fill="#b7a68e">load a module from disk</text>
+    <text x="342" y="52" text-anchor="end" class="mono n" fill="#d41414">PERSIST</text>
+  </g>
+  <g transform="translate(800 174)">
+    <rect width="360" height="100" rx="8" fill="#0c0808" stroke="#d41414" stroke-opacity=".22"/>
+    <circle cx="20" cy="20" r="3" fill="#d41414" class="pulse"/>
+    <text x="32" y="23" class="mono n" fill="#7d7062">06 / SCRIPT</text>
+    <text x="18" y="52" class="mono cmd" fill="#f0e2c8">lua</text>
+    <text x="18" y="76" class="mono d" fill="#b7a68e">inline script, same process</text>
+    <text x="342" y="52" text-anchor="end" class="mono n" fill="#d41414">INLINE</text>
+  </g>
+
+  <text x="40" y="308" class="mono foot" fill="#7d7062">THE api PROTO REACHES EVERY COMMAND fs_cli CAN RUN</text>
+  <text x="1160" y="308" text-anchor="end" class="mono foot" fill="#7d7062">NO SEPARATE EXPLOIT PER ACTION</text>
+</svg>
